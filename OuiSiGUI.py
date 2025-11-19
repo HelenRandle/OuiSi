@@ -3,7 +3,7 @@ from PIL import Image, ImageTk
 
 root = tk.Tk()
 root.title("OuiSi!")
-img = Image.open("ouisi-nature-099-inaê-guion-6-a.jpg")  
+img = Image.open("099.jpg")  
 img = ImageTk.PhotoImage(img)
 box = Image.open("box.png")  
 box = ImageTk.PhotoImage(box)

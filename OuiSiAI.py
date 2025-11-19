@@ -15,7 +15,7 @@ semanticModel = clip.load() #cosine similarity
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-function compareTwo(im1, im2):
+def compareTwo(im1, im2):
     """
     Inputs: im1 and im2 strings, filepaths
     Outputs:
