@@ -1,14 +1,20 @@
 import tkinter as tk
 from PIL import Image, ImageTk
+import numpy as np
 
 root = tk.Tk()
 root.title("OuiSi!")
-img = Image.open("099.jpg")  
-img = ImageTk.PhotoImage(img)
 box = Image.open("box.png")  
 box = ImageTk.PhotoImage(box)
+cardDeck = range(1,210)
+cardDeck = np.random.shuffle(cardDeck)
 
 for row in range(6):
+    filepath = "../ouisi-nature-"+str(0)*3-len(str(cardDeck[0]))+str(cardDeck[0])
+    img = Image.open(filepath)
+    img = ImageTk.PhotoImage(img)
+    cardDeck.pop()  
+    
     for col in range(12):
         tk.Button(
                 root,
