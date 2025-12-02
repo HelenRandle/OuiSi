@@ -13,6 +13,9 @@ shapeModel = load_model("resnet50_trained_on_SIN")
 textureModel = torchvision.models.resnet50(pretrained=False)
 semanticModel = clip.load() #cosine similarity
 
+print("shape: \n",shapeModel,"\n-------------------------")
+print("texture: \n",textureMOdel,"\n--------------------------")
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def compareTwo(im1, im2):
