@@ -67,5 +67,5 @@ def compareTwo(im1Path, im2Path):
     output = output/4
     return output
 
-rootPath = "../Downloads/OuiSiOG"
-compareTwo(str(rootPath+"/ouisi-nature-002.jpg"),str(rootPath+"/ouisi-nature-005.jpg"))
+# rootPath = "../Downloads/OuiSiOG"
+# compareTwo(str(rootPath+"/ouisi-nature-002.jpg"),str(rootPath+"/ouisi-nature-005.jpg"))

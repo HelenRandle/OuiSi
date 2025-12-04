@@ -15,33 +15,50 @@ matchDict = {}
 openImages = {}
 board = np.zeros((6,12))
 
+def on_button_click(self, boardOrHand):
+    button_id = button_var.get()
+    print(f"The ID of the button is: {button_id}")
+    return
+
 for row in range(6):
     for col in range(12):
+        board_id=0
         if (row==2 and col==5):
-            filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(cardDeck[0])))+str(cardDeck[0])+".jpg"
-            openImages["imgstarter"] = Image.open(filepath)
-            openImages["imgstarter"] = ImageTk.PhotoImage(openImages["imgstarter"])
-            im = openImages["imgstarter"]
+            board_id = cardDeck[0]
+            board[row][col] = board_id
+
+            filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(board_id)))+str(board_id)+".jpg"
+            openImages["img"+str(board_id)] = Image.open(filepath)
+            openImages["img"+str(board_id)] = ImageTk.PhotoImage(openImages["img"+str(board_id)])
+            im = openImages["img"+str(board_id)]
+
             cardDeck = cardDeck[1:]
         else:
-            im=box,
-        tk.Button(
+            im=box
+        button_var = tk.StringVar(value=str(board_id))
+        button = tk.Button(
                 root,
                 image = im,
                 width=80,
-                height=80
+                height=80,
+                command=lambda: on_button_click(self, "board"),
+                textvariable=button_var
         ).grid(row=row, column=col, padx=1, pady=1)
 
 for column in range(0,10,2):
-    filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(cardDeck[0])))+str(cardDeck[0])+".jpg"
-    openImages["img"+str(column)] = Image.open(filepath)
-    openImages["img"+str(column)] = ImageTk.PhotoImage(openImages["img"+str(column)])
+    id = cardDeck[0]
+    filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(id)))+str(id)+".jpg"
+    openImages["img"+str(id)] = Image.open(filepath,)
+    openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+str(id)])
     cardDeck = cardDeck[1:]
-    tk.Button(
+    button_var = tk.StringVar(value=str(id))
+    tk.Button( 
         root,
-        image=openImages["img"+str(column)],
+        image=openImages["img"+str(id)],
         width=160,
-        height=160
+        height=160,
+        command=lambda: on_button_click(self, "hand"),
+        textvariable=button_var
     ).grid(row=6, column=column, padx=1, pady=1, columnspan=2, rowspan=2) 
 
 aiHand = cardDeck[:6]
