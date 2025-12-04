@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 import random
 import numpy as np
 from OuiSiAI import compareTwo
+import copy
 
 root = tk.Tk()
 root.title("OuiSi!")
@@ -14,12 +15,47 @@ random.shuffle(cardDeck)
 matchDict = {}
 openImages = {}
 board = np.zeros((6,12))
+handCardSelected = (-1,(-1,-1)) #(imNum, (row, col))
 
-def on_button_click(self, boardOrHand):
-    button_id = button_var.get()
-    print(f"The ID of the button is: {button_id}")
-    return
+def on_button_click(boardOrHand,imNum, boardCoords):
+    """
+    Input: boardOrHand, a string either "board" or "hand", 
+    imNum an int representing the image number, boardCoords a tuple of ints in form (row, col)
+    Output: None
+    """
+    global handCardSelected
+    allOpenSpaces = getAllOpenCards()
+    allOpenSpaces = [x[1] for x in allOpenSpaces]
+    if boardOrHand == "board" and handCardSelected[0] > 0:
+        if boardCoords in allOpenSpaces:
+            #board update
+            print(boardCoords)
+            print(type(boardCoords))
+            boardPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(handCardSelected[0])))+str(handCardSelected[0])+".jpg"
+            board_img = Image.open(boardPath)
+            board_img = ImageTk.PhotoImage(board_img)
+            root[boardCoords].configure(image = board_img)
+            board[boardCoords] = handCardSelected[0]
+            #handupdate
+            newCard = cardDeck[0]
+            handPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(newCard)))+str(newCard)+".jpg"
+            hand_img = Image.open(handPath)
+            hand_img = ImageTk.PhotoImage(hand_img)
+            root[handCardSelected[1]].configure(image = hand_img)
+            root[handCardSelected[1]].configure(command=lambda newCard=newCard: on_button_click("hand", newCard, handCardSelected[1]))
+            cardDeck = cardDeck[1:]
+            handCardSelected = (-1, (-1,-1))
+            aiTurn()
+        else:
+            print("That space is not open!")
+    elif boardOrHand == "board" and handCardSelected[0] <=0:
+        print("Click a card in your hand before choosing a place on the board!")
+    elif boardOrHand == "hand":
+        handCardSelected = (imNum,boardCoords)
+        print("Selected card from hand! Now click on a space on the board to place it!")
 
+
+    
 for row in range(6):
     for col in range(12):
         board_id=0
@@ -35,30 +71,26 @@ for row in range(6):
             cardDeck = cardDeck[1:]
         else:
             im=box
-        button_var = tk.StringVar(value=str(board_id))
         button = tk.Button(
                 root,
                 image = im,
                 width=80,
                 height=80,
-                command=lambda: on_button_click(self, "board"),
-                textvariable=button_var
+                command=lambda row=row, col=col: on_button_click("board", 0, (row, col)),
         ).grid(row=row, column=col, padx=1, pady=1)
 
 for column in range(0,10,2):
     id = cardDeck[0]
     filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(id)))+str(id)+".jpg"
     openImages["img"+str(id)] = Image.open(filepath,)
-    openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+str(id)])
+    openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+copy.deepcopy(str(id))])
     cardDeck = cardDeck[1:]
-    button_var = tk.StringVar(value=str(id))
     tk.Button( 
         root,
         image=openImages["img"+str(id)],
         width=160,
         height=160,
-        command=lambda: on_button_click(self, "hand"),
-        textvariable=button_var
+        command=lambda id=id: on_button_click("hand", id, (6,column)),
     ).grid(row=6, column=column, padx=1, pady=1, columnspan=2, rowspan=2) 
 
 aiHand = cardDeck[:6]
@@ -144,4 +176,3 @@ def aiTurn():
     cardDeck = cardDeck[1:]
 
 root.mainloop()
-#figure out how to take turns :D
