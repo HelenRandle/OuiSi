@@ -83,7 +83,6 @@ def score(card, match):
             return score
 
 
-
 def playerTurn():
     """
     let player click own card and place on board
@@ -92,27 +91,57 @@ def playerTurn():
     #play card
     #dont forget to draw card
 
+def inRange(r,c):
+    return 0 <= r < 6 and 0 <= c < 12
+
 def getAllOpenCards():
     """
     input: none
-    output: numbers of all images on board
+    output: numbers and locations of available tiles nearby for of all open images on board
     """
-    return 0
+    directions = [(1,0),(-1,0),(0,1),(0,-1)]
+    spots = []
+
+    #loop through board
+    for r in range(6):
+        for c in range(12):
+            #check if spot is already taken
+            if board[r][c]:
+                continue
+            #loop through neighbors and check if one of them has an image while the other 3 are empty
+            for dr,dc in directions:
+                    if not inRange(r+dr,c+dc):
+                        continue
+                    imgNeighbor = board[r+dr][c+dc]
+                    othersEmpty = not any(board[r+dr2][c+dc2] for dr2,dc2 in directions if (dr2,dc2) != (dr,dc) and inRange(r+dr2,c+dc2))
+                    if imgNeighbor and othersEmpty:
+                        spots.append((imgNeighbor, (r, c)))
+    return spots
 
 def aiTurn():
-    bestScore = (0, 0, 0) #(card matched with, card played, score)
+    bestScore = ((0,0), 0, 0) #(card matched with, card played, score)
+
+    #find best match
     boardCards = getAllOpenCards()
     for card in aiHand:
         for match in boardCards:
-            newScore = score(card, match)
+            newScore = score(card, match[0])
             if newScore > bestScore[2]:
-                bestScore[0] = match
+                bestScore[0] = match[1]
                 bestScore[1] = card
                 bestScore[2] = newScore
                 
-    #play card, draw card
+    #play card
+    imgPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(bestScore[1])))+str(bestScore[1])+".jpg"
+    img = Image.open(imgPath)
+    img = ImageTk.PhotoImage(img)
+    root[bestScore[0]].configure(image = img)
+    board[bestScore[0]] = bestScore[1]
 
-
+    #draw card
+    aiHand.remove(bestScore[1])
+    aiHand.append(cardDeck[0])
+    cardDeck = cardDeck[1:]
 
 root.mainloop()
 #figure out how to take turns :D
