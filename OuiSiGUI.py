@@ -13,7 +13,8 @@ box = ImageTk.PhotoImage(box)
 cardDeck = list(range(1,210))
 random.shuffle(cardDeck)
 matchDict = {}
-openImages = {}
+openImages = {} #id: opened img object
+buttonGrid  = [] #2d array of button objects
 board = np.zeros((6,12))
 handCardSelected = (-1,(-1,-1)) #(imNum, (row, col))
 
@@ -24,25 +25,26 @@ def on_button_click(boardOrHand,imNum, boardCoords):
     Output: None
     """
     global handCardSelected
+    global cardDeck
     allOpenSpaces = getAllOpenCards()
     allOpenSpaces = [x[1] for x in allOpenSpaces]
     if boardOrHand == "board" and handCardSelected[0] > 0:
         if boardCoords in allOpenSpaces:
             #board update
-            print(boardCoords)
-            print(type(boardCoords))
             boardPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(handCardSelected[0])))+str(handCardSelected[0])+".jpg"
-            board_img = Image.open(boardPath)
-            board_img = ImageTk.PhotoImage(board_img)
-            root[boardCoords].configure(image = board_img)
-            board[boardCoords] = handCardSelected[0]
+            openImages["img"+str(handCardSelected[0])] = Image.open(boardPath)
+            openImages["img"+str(handCardSelected[0])] = ImageTk.PhotoImage(openImages["img"+str(handCardSelected[0])])
+            buttonGrid[boardCoords[0]][boardCoords[1]].configure(image = openImages["img"+str(handCardSelected[0])])
+            board[boardCoords[0]][boardCoords[1]] = handCardSelected[0]
+
             #handupdate
             newCard = cardDeck[0]
             handPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(newCard)))+str(newCard)+".jpg"
-            hand_img = Image.open(handPath)
-            hand_img = ImageTk.PhotoImage(hand_img)
-            root[handCardSelected[1]].configure(image = hand_img)
-            root[handCardSelected[1]].configure(command=lambda newCard=newCard: on_button_click("hand", newCard, handCardSelected[1]))
+            openImages["img"+str(newCard)]  = Image.open(handPath)
+            openImages["img"+str(newCard)] = ImageTk.PhotoImage(openImages["img"+str(newCard)])
+            coords = handCardSelected[1] # (row, col)
+            buttonGrid[coords[0]][coords[1]].configure(image = openImages["img"+str(newCard)])
+            buttonGrid[coords[0]][coords[1]].configure(command=lambda newCard=newCard: on_button_click("hand", newCard, coords))
             cardDeck = cardDeck[1:]
             handCardSelected = (-1, (-1,-1))
             aiTurn()
@@ -57,6 +59,7 @@ def on_button_click(boardOrHand,imNum, boardCoords):
 
     
 for row in range(6):
+    buttonRow = []
     for col in range(12):
         board_id=0
         if (row==2 and col==5):
@@ -77,21 +80,33 @@ for row in range(6):
                 width=80,
                 height=80,
                 command=lambda row=row, col=col: on_button_click("board", 0, (row, col)),
-        ).grid(row=row, column=col, padx=1, pady=1)
+        )
+        buttonRow.append(button)
+        button.grid(row=row, column=col, padx=1, pady=1)
+    buttonGrid.append(buttonRow)
 
+handRow = []
 for column in range(0,10,2):
     id = cardDeck[0]
     filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(id)))+str(id)+".jpg"
     openImages["img"+str(id)] = Image.open(filepath,)
-    openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+copy.deepcopy(str(id))])
+    openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+str(id)])
     cardDeck = cardDeck[1:]
-    tk.Button( 
+    if column == 0:
+        colCoord = 0
+    else:
+        colCoord = int(column/2)
+    button = tk.Button( 
         root,
         image=openImages["img"+str(id)],
         width=160,
         height=160,
-        command=lambda id=id: on_button_click("hand", id, (6,column)),
-    ).grid(row=6, column=column, padx=1, pady=1, columnspan=2, rowspan=2) 
+        command=lambda id=id,colCoord=colCoord: on_button_click("hand", id, (6,colCoord)),
+    )
+    handRow.append(button)
+    button.grid(row=6, column=column, padx=1, pady=1, columnspan=2, rowspan=2)
+
+buttonGrid.append(handRow)
 
 aiHand = cardDeck[:6]
 cardDeck = cardDeck[6:]
@@ -113,15 +128,6 @@ def score(card, match):
             score = compareTwo(cardPath, matchPath)
             matchDict[str(match)+str(card)] = score
             return score
-
-
-def playerTurn():
-    """
-    let player click own card and place on board
-    update board 2d array
-    """
-    #play card
-    #dont forget to draw card
 
 def inRange(r,c):
     return 0 <= r < 6 and 0 <= c < 12
@@ -151,13 +157,14 @@ def getAllOpenCards():
     return spots
 
 def aiTurn():
-    bestScore = ((0,0), 0, 0) #(card matched with, card played, score)
+    global cardDeck
+    bestScore = [(0,0), 0, 0] #(card matched with, card played, score)
 
     #find best match
     boardCards = getAllOpenCards()
     for card in aiHand:
         for match in boardCards:
-            newScore = score(card, match[0])
+            newScore = score(card, int(match[0]))
             if newScore > bestScore[2]:
                 bestScore[0] = match[1]
                 bestScore[1] = card
@@ -165,9 +172,9 @@ def aiTurn():
                 
     #play card
     imgPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(bestScore[1])))+str(bestScore[1])+".jpg"
-    img = Image.open(imgPath)
-    img = ImageTk.PhotoImage(img)
-    root[bestScore[0]].configure(image = img)
+    openImages["img"+str(bestScore[1])] = Image.open(imgPath)
+    openImages["img"+str(bestScore[1])] = ImageTk.PhotoImage(openImages["img"+str(bestScore[1])])
+    buttonGrid[bestScore[0][0]][bestScore[0][1]].config(image = openImages["img"+str(bestScore[1])])
     board[bestScore[0]] = bestScore[1]
 
     #draw card
