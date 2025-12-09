@@ -33,6 +33,7 @@ def on_button_click(boardOrHand,imNum, boardCoords):
             #board update
             boardPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(handCardSelected[0])))+str(handCardSelected[0])+".jpg"
             openImages["img"+str(handCardSelected[0])] = Image.open(boardPath)
+            openImages["img"+str(handCardSelected[0])] = openImages["img"+str(handCardSelected[0])].resize((80,80))
             openImages["img"+str(handCardSelected[0])] = ImageTk.PhotoImage(openImages["img"+str(handCardSelected[0])])
             buttonGrid[boardCoords[0]][boardCoords[1]].configure(image = openImages["img"+str(handCardSelected[0])])
             board[boardCoords[0]][boardCoords[1]] = handCardSelected[0]
@@ -41,6 +42,7 @@ def on_button_click(boardOrHand,imNum, boardCoords):
             newCard = cardDeck[0]
             handPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(newCard)))+str(newCard)+".jpg"
             openImages["img"+str(newCard)]  = Image.open(handPath)
+            openImages["img"+str(newCard)] = openImages["img"+str(newCard)].resize((160,160))
             openImages["img"+str(newCard)] = ImageTk.PhotoImage(openImages["img"+str(newCard)])
             coords = handCardSelected[1] # (row, col)
             buttonGrid[coords[0]][coords[1]].configure(image = openImages["img"+str(newCard)])
@@ -68,6 +70,7 @@ for row in range(6):
 
             filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(board_id)))+str(board_id)+".jpg"
             openImages["img"+str(board_id)] = Image.open(filepath)
+            openImages["img"+str(board_id)] = openImages["img"+str(board_id)].resize((80,80))
             openImages["img"+str(board_id)] = ImageTk.PhotoImage(openImages["img"+str(board_id)])
             im = openImages["img"+str(board_id)]
 
@@ -90,6 +93,7 @@ for column in range(0,10,2):
     id = cardDeck[0]
     filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(id)))+str(id)+".jpg"
     openImages["img"+str(id)] = Image.open(filepath,)
+    openImages["img"+str(id)] = openImages["img"+str(id)].resize((160,160))
     openImages["img"+str(id)] = ImageTk.PhotoImage(openImages["img"+str(id)])
     cardDeck = cardDeck[1:]
     if column == 0:
@@ -173,6 +177,7 @@ def aiTurn():
     #play card
     imgPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(bestScore[1])))+str(bestScore[1])+".jpg"
     openImages["img"+str(bestScore[1])] = Image.open(imgPath)
+    openImages["img"+str(bestScore[1])] = openImages["img"+str(bestScore[1])].resize((80,80))
     openImages["img"+str(bestScore[1])] = ImageTk.PhotoImage(openImages["img"+str(bestScore[1])])
     buttonGrid[bestScore[0][0]][bestScore[0][1]].config(image = openImages["img"+str(bestScore[1])])
     board[bestScore[0]] = bestScore[1]
