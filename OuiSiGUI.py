@@ -115,6 +115,27 @@ buttonGrid.append(handRow)
 aiHand = cardDeck[:6]
 cardDeck = cardDeck[6:]
 
+# AIhandRow = []
+# for column in range(0,10,2):
+#     if column == 0:
+#         colCoord = 0
+#     else:
+#         colCoord = int(column/2)
+#     filepath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(aiHand[colCoord])))+str(aiHand[colCoord])+".jpg"
+#     openImages["img"+str(aiHand[colCoord])] = Image.open(filepath,)
+#     openImages["img"+str(aiHand[colCoord])] = openImages["img"+str(aiHand[colCoord])].resize((160,160))
+#     openImages["img"+str(aiHand[colCoord])] = ImageTk.PhotoImage(openImages["img"+str(aiHand[colCoord])])
+#     button = tk.Button( 
+#         root,
+#         image=openImages["img"+str(aiHand[colCoord])],
+#         width=160,
+#         height=160
+#     )
+#     AIhandRow.append(button)
+#     button.grid(row=8, column=column, padx=1, pady=1, columnspan=2, rowspan=2)
+
+# buttonGrid.append(handRow)
+
 def score(card, match):
     cardPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(card)))+str(card)+".jpg"
     matchPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(match)))+str(match)+".jpg"
@@ -175,6 +196,7 @@ def aiTurn():
                 bestScore[2] = newScore
                 
     #play card
+    # print("The best match was card " + str(bestScore[1]) + " with score " + str(bestScore[2]))
     imgPath = pathRoot+"ouisi-nature-"+str(0)*(3-len(str(bestScore[1])))+str(bestScore[1])+".jpg"
     openImages["img"+str(bestScore[1])] = Image.open(imgPath)
     openImages["img"+str(bestScore[1])] = openImages["img"+str(bestScore[1])].resize((80,80))
@@ -186,5 +208,6 @@ def aiTurn():
     aiHand.remove(bestScore[1])
     aiHand.append(cardDeck[0])
     cardDeck = cardDeck[1:]
+    # print(board)
 
 root.mainloop()

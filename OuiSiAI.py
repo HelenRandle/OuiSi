@@ -21,7 +21,8 @@ return_texture_nodes = {
     "layer1.1.conv1": "layer1"
 }
 return_shape_nodes = {
-    "layer4.2.conv3": "layer4"
+    # "layer4.2.conv3": "layer4"
+    "layer3.2.conv3": "layer3"
 }
 textureModel = create_feature_extractor(texturePremodel, return_nodes=return_texture_nodes)
 shapeModel = create_feature_extractor(shapePremodel, return_nodes=return_shape_nodes)
@@ -42,19 +43,19 @@ def compareTwo(im1Path, im2Path):
     im2_features = semanticModel.encode_image(im2CLIP)
     cossim = CosineSimilarity(dim=0, eps=1e-6)
     semanticDistance = cossim(torch.flatten(im1_features), torch.flatten(im2_features)).item()*100
-    # print(semanticDistance.item())
+    # print("Semantic distance " + str(semanticDistance))
 
     #shape
-    im1Shape = torch.flatten(shapeModel(im1CLIP)['layer4'])
-    im2Shape = torch.flatten(shapeModel(im2CLIP)['layer4'])
+    im1Shape = torch.flatten(shapeModel(im1CLIP)['layer3'])
+    im2Shape = torch.flatten(shapeModel(im2CLIP)['layer3'])
     shapeDistance = cossim(im1Shape, im2Shape).item()*100 #get vector from last layer of neural network
-    # print(shapeDistance.item())
+    # print("Shape distance " + str(shapeDistance))
 
     #texture
     im1Texture = torch.flatten(textureModel(im1CLIP)['layer1'])
     im2Texture = torch.flatten(textureModel(im2CLIP)['layer1'])
     textureDistance = cossim(im1Texture, im2Texture).item()*100 #get vector from lower layer of neural network
-    # print(textureDistance.item())
+    # print(textureDistance)
     
     #color
     color_thief1 = ColorThief(im1Path)
@@ -62,9 +63,11 @@ def compareTwo(im1Path, im2Path):
     color1 = color_thief1.get_color(quality=1)
     color2 = color_thief2.get_color(quality=1)
     colorDistance =  basic_colormath.get_delta_e(color1, color2)
+    # print(colorDistance)
+
 
     output = semanticDistance*0.2 + shapeDistance*0.52 + textureDistance*0.09 + colorDistance*0.18
-    output = output/4
+    # print("Overall Score of" + str(output))
     return output
 
 # rootPath = "../Downloads/OuiSiOG"
